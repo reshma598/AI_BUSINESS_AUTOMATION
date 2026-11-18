@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Business Automation Agent</title>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;font:15px Arial;background:#f1f5f9;color:#172554}
+button{padding:10px;background:#2563eb;color:white;border:0;border-radius:6px;cursor:pointer;margin:4px}
+input,textarea,select{width:100%;padding:10px;margin:6px 0 12px;border:1px solid #ccc;border-radius:5px}
+.box,.card{background:white;padding:16px;margin:12px 0;border-radius:8px}
+.hidden,.page{display:none}
+.active{display:block}
+.auth{max-width:400px;margin:8% auto;padding:25px;background:white;border-radius:10px}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:210px;background:#172554;color:white;padding:15px}
+.sidebar button{display:block;width:100%;text-align:left}
+.main{padding:20px;flex:1;min-width:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.card h2{color:#2563eb}
+.item{background:#f8fafc;padding:12px;margin:8px 0;border-left:4px solid #2563eb;overflow-wrap:anywhere}
+.chat{height:220px;overflow:auto;background:#f8fafc;padding:10px}
+.msg{padding:10px;margin:6px;background:#dbeafe;border-radius:6px;white-space:pre-wrap}
+@media(max-width:700px){.layout{display:block}.sidebar{width:100%}.main{padding:10px}}
+</style>
+</head>
+
+<body>
+
+<!-- STAGE 9: LOGIN AND REGISTRATION -->
+
+<section id="auth" class="auth">
+<h2>AI Business Automation Agent</h2>
+
+<div id="loginBox">
+<h3>Login</h3>
+<input id="loginEmail" type="email" placeholder="Email">
+<input id="loginPassword" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+<p>New user? <button onclick="toggleAuth()">Register</button></p>
+</div>
+
+<div id="registerBox" class="hidden">
+<h3>Create Account</h3>
+<input id="regName" placeholder="Full Name">
+<input id="regEmail" type="email" placeholder="Email">
+<input id="regPassword" type="password" placeholder="Password (8+ characters)">
+<button onclick="register()">Register</button>
+<button onclick="toggleAuth()">Back</button>
+</div>
+
+<p id="authMessage"></p>
+</section>
+
+
+<!-- MAIN APPLICATION -->
+
+<div id="app" class="layout hidden">
+
+<aside class="sidebar">
+<h2>AI Business Agent</h2>
+<p id="userName"></p>
+
+<button onclick="showPage('dashboard')">Dashboard</button>
+<button onclick="showPage('assistant')">AI Assistant</button>
+<button onclick="showPage('hr')">HRMS Agent</button>
+<button onclick="showPage('crm')">CRM Agent</button>
+<button onclick="showPage('projects')">Project Agent</button>
+<button onclick="showPage('email')">Email Agent</button>
+<button onclick="showPage('activity')">Activity Center</button>
+<button onclick="showPage('admin')">Admin Panel</button>
+<button onclick="logout()">Logout</button>
+</aside>
+
+
+<main class="main">
+
+<!-- STAGE 1-3: DASHBOARD -->
+
+<section id="dashboard" class="page active">
+<h1>Business Dashboard</h1>
+
+<div class="grid">
+<div class="card">Employees<h2 id="employees">0</h2></div>
+<div class="card">Customers<h2 id="customers">0</h2></div>
+<div class="card">Leads<h2 id="leads">0</h2></div>
+<div class="card">Projects<h2 id="projects">0</h2></div>
+<div class="card">Pending Tasks<h2 id="pending">0</h2></div>
+</div>
+
+<h3 id="welcome"></h3>
+</section>
+
+
+<!-- CENTRAL AI ASSISTANT -->
+
+<section id="assistant" class="page">
+<h2>AI Business Assistant</h2>
+<div id="chat" class="chat"></div>
+
+<input id="question" placeholder="Ask your business question..."
+onkeydown="if(event.key==='Enter')askAI()">
+
+<button onclick="askAI()">Send Message</button>
+</section>
+
+
+<!-- STAGE 4: HRMS -->
+
+<section id="hr" class="page">
+<h2>HR Management System</h2>
+
+<div class="box">
+<h3>Add Employee</h3>
+<form onsubmit="addEmployee(event)">
+<input id="empName" placeholder="Employee Name" required>
+<input id="empRole" placeholder="Employee Role" required>
+<select id="attendance">
+<option>Present</option>
+<option>Absent</option>
+<option>Leave</option>
+<option>Not Marked</option>
+</select>
+<button>Add Employee</button>
+</form>
+</div>
+
+<div class="box">
+<h3>Employees</h3>
+<button onclick="loadEmployees()">View Employees</button>
+<div id="employeeList"></div>
+</div>
+
+<div class="box">
+<h3>AI Resume Screening</h3>
+<form onsubmit="screenResume(event)">
+<input id="jobRole" placeholder="Job Role" required>
+<textarea id="jobDescription" placeholder="Job Description" required></textarea>
+<input id="resumeFile" type="file" accept=".pdf" required>
+<button id="screenButton">Screen Resume</button>
+</form>
+<pre id="resumeResult"></pre>
+<button onclick="loadResumes()">View Candidates</button>
+<div id="resumeList"></div>
+</div>
+</section>
+
+
+<!-- STAGE 5: CRM -->
+
+<section id="crm" class="page">
+<h2>CRM Lead Management</h2>
+
+<div class="box">
+<form onsubmit="addLead(event)">
+<input id="leadName" placeholder="Lead Name" required>
+<input id="leadEmail" type="email" placeholder="Email">
+<input id="leadPhone" placeholder="Phone">
+<input id="leadCompany" placeholder="Company">
+<textarea id="requirement" placeholder="Customer Requirement"></textarea>
+<button>Add Lead</button>
+</form>
+<p id="leadMessage"></p>
+</div>
+
+<button onclick="loadLeads()">View Leads</button>
+<div id="leadList"></div>
+</section>
+
+
+<!-- STAGE 6: PROJECT MANAGEMENT -->
+
+<section id="projects" class="page">
+<h2>Project Management</h2>
+
+<div class="box">
+<h3>Create Project</h3>
+<form onsubmit="addProject(event)">
+<input id="projectName" placeholder="Project Name" required>
+<textarea id="projectDescription" placeholder="Description"></textarea>
+<input id="projectDeadline" type="date">
+<button>Create Project</button>
+</form>
+</div>
+
+<button onclick="loadProjects()">View Projects</button>
+<div id="projectList"></div>
+
+<div class="box">
+<h3>Add Project Task</h3>
+<form onsubmit="addTask(event)">
+<input id="projectId" type="number" placeholder="Project ID" required>
+<input id="taskName" placeholder="Task Name" required>
+<textarea id="taskDescription" placeholder="Description"></textarea>
+<input id="assignedTo" placeholder="Assigned To">
+<select id="priority">
+<option>Low</option>
+<option selected>Medium</option>
+<option>High</option>
+</select>
+<input id="taskDeadline" type="date">
+<button>Add Task</button>
+</form>
+</div>
+
+<button onclick="loadTasks()">View Tasks</button>
+<div id="taskList"></div>
+</section>
+
+
+<!-- STAGE 8: EMAIL AUTOMATION -->
+
+<section id="email" class="page">
+<h2>Email Automation Agent</h2>
+
+<div class="box">
+<h3>Generate Email</h3>
+<form onsubmit="generateEmail(event)">
+<input id="purpose" placeholder="Email Purpose" required>
+<input id="recipientName" placeholder="Recipient Name" required>
+<textarea id="details" placeholder="Email Details" required></textarea>
+<button>Generate Draft</button>
+</form>
+</div>
+
+<div class="box">
+<h3>Review and Send Email</h3>
+<form onsubmit="sendEmail(event)">
+<input id="emailTo" type="email" placeholder="Recipient Email" required>
+<input id="subject" placeholder="Subject" required>
+<textarea id="emailBody" placeholder="Email Body" required></textarea>
+<button>Send Email</button>
+</form>
+<p id="emailMessage"></p>
+</div>
+
+<button onclick="loadEmailHistory()">Email History</button>
+<div id="emailHistory"></div>
+</section>
+
+
+<!-- STAGE 7: ACTIVITY CENTER -->
+
+<section id="activity" class="page">
+<h2>AI Agent Activity Center</h2>
+<button onclick="loadActivities()">Refresh Activities</button>
+<p id="activitySummary"></p>
+<div id="activityList"></div>
+</section>
+
+
+<!-- STAGE 9: ADMIN -->
+
+<section id="admin" class="page">
+<h2>Admin Panel</h2>
+<button onclick="loadAdmin()">View Users</button>
+<div id="adminUsers"></div>
+</section>
+
+</main>
+</div>
+
+
+<!-- JAVASCRIPT: CONNECT FRONTEND TO FASTAPI -->
+
+<script>
+
+const $ = id => document.getElementById(id);
+
+async function api(url,options={}) {
+    const response = await fetch(url,{
+        credentials:"include",
+        ...options
+    });
+
+    const data = await response.json().catch(()=>({detail:"Server error"}));
+
+    if(!response.ok) throw Error(data.detail || "Request failed");
+
+    return data;
+}
+
+const post = data => ({
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(data)
+});
+
+function toggleAuth(){
+    $("loginBox").classList.toggle("hidden");
+    $("registerBox").classList.toggle("hidden");
+}
+
+function showPage(id){
+    document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+    $(id).classList.add("active");
+    refresh(id);
+}
+
+function addItem(id,title,lines,action){
+    const div=document.createElement("div");
+    div.className="item";
+
+    const heading=document.createElement("b");
+    heading.textContent=title;
+    div.append(heading);
+
+    lines.forEach(line=>{
+        const p=document.createElement("p");
+        p.textContent=line ?? "";
+        div.append(p);
+    });
+
+    if(action){
+        const b=document.createElement("button");
+        b.textContent=action[0];
+        b.onclick=action[1];
+        div.append(b);
+    }
+
+    $(id).append(div);
+}
+
+
+// STAGE 9: AUTHENTICATION
+
+async function register(){
+    try{
+        const d=await api("/register",post({
+            name:$("regName").value,
+            email:$("regEmail").value,
+            password:$("regPassword").value
+        }));
+
+        $("authMessage").textContent=d.message;
+        toggleAuth();
+    }catch(e){
+        $("authMessage").textContent=e.message;
+    }
+}
+
+async function login(){
+    try{
+        await api("/login",post({
+            email:$("loginEmail").value,
+            password:$("loginPassword").value
+        }));
+        await openApp();
+    }catch(e){
+        $("authMessage").textContent=e.message;
+    }
+}
+
+async function logout(){
+    try{await api("/logout",{method:"POST"});}catch(e){}
+    $("app").classList.add("hidden");
+    $("auth").classList.remove("hidden");
+}
+
+async function openApp(){
+    try{
+        const u=await api("/me");
+        $("auth").classList.add("hidden");
+        $("app").classList.remove("hidden");
+        $("userName").textContent=u.name+" ("+u.role+")";
+        await dashboard();
+    }catch(e){
+        $("auth").classList.remove("hidden");
+        $("app").classList.add("hidden");
+    }
+}
+
+
+// DASHBOARD
+
+async function dashboard(){
+    const d=await api("/dashboard");
+
+    ["employees","customers","leads","projects"].forEach(k=>{
+        $(k).textContent=d[k];
+    });
+
+    $("pending").textContent=d.pending_tasks;
+    $("welcome").textContent="Welcome, "+d.user.name;
+}
+
+
+// STAGE 3: AI CHATBOT
+
+async function askAI(){
+    const message=$("question").value.trim();
+    if(!message)return;
+
+    $("question").value="";
+    addItem("chat","You",[message]);
+
+    try{
+        const d=await api("/chat",post({message}));
+        addItem("chat","AI Assistant",[d.response]);
+    }catch(e){
+        addItem("chat","Error",[e.message]);
+    }
+}
+
+
+// STAGE 4: HRMS
+
+async function addEmployee(e){
+    e.preventDefault();
+
+    try{
+        const d=await api("/employees",post({
+            name:$("empName").value,
+            role:$("empRole").value,
+            attendance:$("attendance").value
+        }));
+
+        alert(d.message);
+        e.target.reset();
+        loadEmployees();
+    }catch(x){alert(x.message);}
+}
+
+async function loadEmployees(){
+    try{
+        $("employeeList").innerHTML="";
+        const d=await api("/employees");
+
+        d.employees.forEach(x=>{
+            addItem("employeeList",x.name,[x.role,x.attendance]);
+        });
+    }catch(e){$("employeeList").textContent=e.message;}
+}
+
+
+// RESUME SCREENING
+
+async function screenResume(e){
+    e.preventDefault();
+
+    const file=$("resumeFile").files[0];
+    if(!file)return;
+
+    const fd=new FormData();
+    fd.append("file",file);
+    fd.append("job_role",$("jobRole").value);
+    fd.append("job_description",$("jobDescription").value);
+
+    $("screenButton").disabled=true;
+
+    try{
+        const d=await api("/screen-resume",{method:"POST",body:fd});
+        $("resumeResult").textContent=JSON.stringify(d,null,2);
+        loadResumes();
+    }catch(x){
+        $("resumeResult").textContent=x.message;
+    }finally{
+        $("screenButton").disabled=false;
+    }
+}
+
+async function loadResumes(){
+    try{
+        $("resumeList").innerHTML="";
+        const d=await api("/resumes");
+
+        d.resumes.forEach(x=>{
+            addItem("resumeList",x.candidate_name,[
+                x.job_role,"Score: "+x.score,
+                x.skills,x.recommendation,x.analysis
+            ]);
+        });
+    }catch(e){$("resumeList").textContent=e.message;}
+}
+
+
+// STAGE 5: CRM
+
+async function addLead(e){
+    e.preventDefault();
+
+    try{
+        const d=await api("/add-lead",post({
+            name:$("leadName").value,
+            email:$("leadEmail").value,
+            phone:$("leadPhone").value,
+            company:$("leadCompany").value,
+            requirement:$("requirement").value
+        }));
+
+        $("leadMessage").textContent=d.message;
+        e.target.reset();
+        loadLeads();
+    }catch(x){$("leadMessage").textContent=x.message;}
+}
+
+async function loadLeads(){
+    try{
+        $("leadList").innerHTML="";
+        const d=await api("/leads");
+
+        d.leads.forEach(x=>{
+            addItem("leadList",x.name,[
+                x.company,x.email,x.phone,x.requirement,
+                "Score: "+x.score+" | "+x.category,
+                x.analysis
+            ],["AI Score",()=>scoreLead(x.id)]);
+        });
+    }catch(e){$("leadList").textContent=e.message;}
+}
+
+async function scoreLead(id){
+    try{
+        const d=await api("/score-lead/"+id,{method:"POST"});
+        alert("Score: "+d.score+" | "+d.category);
+        loadLeads();
+    }catch(e){alert(e.message);}
+}
+
+
+// STAGE 6: PROJECTS
+
+async function addProject(e){
+    e.preventDefault();
+
+    try{
+        const d=await api("/add-project",post({
+            name:$("projectName").value,
+            description:$("projectDescription").value,
+            deadline:$("projectDeadline").value
+        }));
+
+        alert("Project created. ID: "+d.id);
+        e.target.reset();
+        loadProjects();
+    }catch(x){alert(x.message);}
+}
+
+async function loadProjects(){
+    try{
+        $("projectList").innerHTML="";
+        const d=await api("/projects");
+
+        d.projects.forEach(x=>{
+            addItem("projectList",x.name,[
+                "Project ID: "+x.id,x.description,x.deadline,x.status
+            ],["Generate AI Plan",()=>generatePlan(x.id)]);
+        });
+    }catch(e){$("projectList").textContent=e.message;}
+}
+
+async function generatePlan(id){
+    try{
+        const d=await api("/generate-project-plan?project_id="+id,{method:"POST"});
+        alert("Created "+d.created_tasks.length+" tasks");
+        loadTasks();
+    }catch(e){alert(e.message);}
+}
+
+async function addTask(e){
+    e.preventDefault();
+
+    try{
+        const d=await api("/add-project-task",post({
+            project_id:Number($("projectId").value),
+            task_name:$("taskName").value,
+            description:$("taskDescription").value,
+            assigned_to:$("assignedTo").value,
+            priority:$("priority").value,
+            deadline:$("taskDeadline").value
+        }));
+
+        alert(d.message);
+        e.target.reset();
+        loadTasks();
+    }catch(x){alert(x.message);}
+}
+
+async function loadTasks(){
+    try{
+        $("taskList").innerHTML="";
+        const d=await api("/project-tasks");
+
+        d.tasks.forEach(x=>{
+            addItem("taskList",x.task_name,[
+                "Project: "+x.project_id,
+                "Assigned: "+x.assigned_to,
+                "Priority: "+x.priority,
+                "Status: "+x.status
+            ]);
+        });
+    }catch(e){$("taskList").textContent=e.message;}
+}
+
+
+// STAGE 8: EMAIL AGENT
+
+async function generateEmail(e){
+    e.preventDefault();
+
+    try{
+        const d=await api("/generate-email",post({
+            purpose:$("purpose").value,
+            recipient_name:$("recipientName").value,
+            details:$("details").value
+        }));
+
+        $("emailBody").value=d.email;
+        $("emailMessage").textContent="Draft generated. Review before sending.";
+    }catch(x){$("emailMessage").textContent=x.message;}
+}
+
+async function sendEmail(e){
+    e.preventDefault();
+
+    try{
+        const d=await api("/send-email",post({
+            to:$("emailTo").value,
+            subject:$("subject").value,
+            body:$("emailBody").value
+        }));
+
+        $("emailMessage").textContent=d.message;
+        loadEmailHistory();
+    }catch(x){$("emailMessage").textContent=x.message;}
+}
+
+async function loadEmailHistory(){
+    try{
+        $("emailHistory").innerHTML="";
+        const d=await api("/email-history");
+
+        d.emails.forEach(x=>{
+            addItem("emailHistory",x.subject,[
+                x.recipient,x.status,x.created_at
+            ]);
+        });
+    }catch(e){$("emailHistory").textContent=e.message;}
+}
+
+
+// STAGE 7: ACTIVITY CENTER
+
+async function loadActivities(){
+    try{
+        const [a,s]=await Promise.all([
+            api("/activities"),
+            api("/activity-summary")
+        ]);
+
+        $("activitySummary").textContent=
+            "Total: "+s.total+
+            " | Completed: "+s.completed+
+            " | Failed: "+s.failed;
+
+        $("activityList").innerHTML="";
+
+        a.activities.forEach(x=>{
+            addItem("activityList",x.agent,[
+                x.user_request,x.status,x.result,x.created_at
+            ]);
+        });
+    }catch(e){$("activityList").textContent=e.message;}
+}
+
+
+// STAGE 9: ADMIN PANEL
+
+async function loadAdmin(){
+    try{
+        $("adminUsers").innerHTML="";
+        const d=await api("/admin/users");
+
+        d.users.forEach(x=>{
+            addItem("adminUsers",x.name,[x.email,x.role]);
+        });
+    }catch(e){$("adminUsers").textContent=e.message;}
+}
+
+
+// REFRESH CURRENT PAGE
+
+function refresh(id){
+    const actions={
+        dashboard,
+        hr:()=>{loadEmployees();loadResumes();},
+        crm:loadLeads,
+        projects:()=>{loadProjects();loadTasks();},
+        email:loadEmailHistory,
+        activity:loadActivities
+    };
+
+    if(actions[id])actions[id]();
+}
+
+window.addEventListener("DOMContentLoaded",openApp);
+
+</script>
+</body>
+</html>
