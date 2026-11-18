@@ -139,3 +139,30 @@ AI-Business-Automation-Agent/
 │
 └── screenshots/
     └── application screenshots
+IMAGES:
+<img width="1920" height="1080" alt="image" src="https://github.com/user-
+    attachments/assets/76b6c6e9-7e4f-4873-81ef-ac35d8cc0604" />
+
+    <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/6956a2a1-f6b7-47f2-b1a6-e935e4576f78" />
+  
+  <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/1f6979bb-c03a-4e95-a4d3-317c04286eaa" />
+
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/5899ecb5-c0d7-4f69-a03d-ffb996a9ad66" />
+ 
+ <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/3e44f6c7-311a-41d9-9cf4-654f235dd99a" />
+
+ 
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/24782a71-460c-4ee4-938d-f996375b9007" />
+
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/6276447c-a3a0-49e9-bb32-5d67d73d8aca" />
+
+
+
+
+    
+
+
+
+
